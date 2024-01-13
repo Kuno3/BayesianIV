@@ -277,7 +277,7 @@ function log_posterior_gamma(model::BayesianIV, G, gamma_at, gamma_nt)
     return log_posterior
 end
 
-function d_nlp_d_beta_at(model::BayesianIV, G, beta_nt)
+function d_nlp_d_beta_at(model::BayesianIV, G, beta_at)
     d_log_prior = (2 * model.N_a / 12 / model.N) * (sum(model.X, dims=1) .- 2 * sum(model.X .* (exp.(model.X * beta_at) ./ (1 .+ exp.(model.X * beta_at))), dims=1))
     if sum(G .== 0) > 0
         X_at = model.X[G .== 0, :]
@@ -434,6 +434,8 @@ function sampling(
     beta_co_c_init=nothing,
     beta_co_t_init=nothing
 )
+    G = zeros(model.N)
+    
     gamma_at = isnothing(gamma_at_init) ? randn(model.dim) : gamma_at_init
     gamma_nt = isnothing(gamma_nt_init) ? randn(model.dim) : gamma_nt_init
     beta_at = isnothing(beta_at_init) ? randn(model.dim) : beta_at_init
